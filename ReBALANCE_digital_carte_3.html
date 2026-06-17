@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RB Carte 3">
+<title>ReBALANCE Digital Carte 3.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f6f2;--white:#fff;--border:#e0dbd0;--border2:#ccc7bc;
+  --text:#1a1a1a;--muted:#999;--light:#f0ede8;--section:#f4f1ec;
+  --gold:#c8a96e;--gold2:#e8c98a;
+  --red:#c0392b;--orange:#e67e22;--green:#27ae60;--blue:#2980b9;
+  --hp-high:#c0392b;--hp-mid:#e67e22;--hp-low:#27ae60;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Noto Sans JP',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body,.main-wrap{background:var(--bg)}
+body{color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:80px}
+button{cursor:pointer;font-family:var(--sans)}
+input,textarea{font-family:var(--sans)}
+
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+
+/* HEADER */
+.app-header{background:var(--white);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.back-btn{background:none;border:1.5px solid var(--border);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);flex-shrink:0;transition:all .15s}
+.back-btn:hover{border-color:var(--gold);color:var(--gold)}
+.header-title{font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:.08em;flex:1}
+.header-act{background:var(--text);color:var(--white);border:none;border-radius:6px;padding:10px 18px;font-size:13px;font-weight:700;letter-spacing:.06em;flex-shrink:0}
+.header-act:hover{background:var(--gold)}
+
+/* LIST */
+.list-header{background:var(--white);padding:30px 20px 24px;border-bottom:1px solid var(--border);text-align:center}
+.list-logo{font-family:var(--serif);font-size:28px;font-weight:300;letter-spacing:.2em}
+.list-rule{width:36px;height:1px;background:var(--gold);margin:7px auto 6px}
+.list-sub{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.list-ver{font-size:10px;letter-spacing:.14em;color:var(--gold);font-family:var(--mono);margin-bottom:20px}
+.search-wrap{position:relative;max-width:480px;margin:0 auto}
+.search-inp{width:100%;background:var(--light);border:1.5px solid var(--border);border-radius:24px;padding:11px 18px 11px 42px;font-size:15px;outline:none;transition:border-color .15s}
+.search-inp:focus{border-color:var(--gold)}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+.client-list{padding:14px 18px;max-width:600px;margin:0 auto}
+.client-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s}
+.client-card:hover{border-color:var(--gold);box-shadow:var(--shadow);transform:translateY(-1px)}
+.client-avatar{width:48px;height:48px;border-radius:50%;background:var(--light);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:22px;color:var(--muted);overflow:hidden;flex-shrink:0}
+.client-avatar img{width:100%;height:100%;object-fit:cover}
+.client-info{flex:1;min-width:0}
+.client-name{font-size:16px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.client-meta{font-size:12px;color:var(--muted)}
+.client-count{font-family:var(--mono);font-size:12px;color:var(--gold);background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:12px;padding:3px 10px;flex-shrink:0}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.empty-text{font-size:14px;line-height:2}
+.fab{position:fixed;bottom:28px;right:24px;width:60px;height:60px;border-radius:50%;background:var(--text);color:var(--white);border:none;font-size:26px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:50}
+.fab:hover{background:var(--gold)}
+
+/* FORM */
+.form-body{padding:0 18px 0;max-width:600px;margin:0 auto}
+.form-section{background:var(--white);border:1.5px solid var(--border);border-radius:12px;margin:14px 0;overflow:hidden}
+.form-section-header{background:var(--section);padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.form-section-num{width:36px;height:36px;border-radius:50%;background:var(--text);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.form-section-title{font-size:17px;font-weight:700;letter-spacing:.04em}
+.form-section-body{padding:18px}
+.form-field{margin-bottom:16px}
+.form-field:last-child{margin-bottom:0}
+.form-label{display:block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.form-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:13px 16px;font-size:16px;outline:none;transition:border-color .15s;color:var(--text)}
+.form-input:focus{border-color:var(--gold);background:var(--white)}
+textarea.form-input{resize:vertical;min-height:80px;line-height:1.7}
+
+/* BUTTONS */
+.tc-btn{border:1.5px solid var(--border);border-radius:8px;background:var(--white);padding:13px 8px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;transition:all .15s;line-height:1.3}
+.tc-btn.selected{border-color:var(--gold);background:rgba(200,169,110,.12);color:var(--text)}
+.tc-btn:hover:not(.selected){background:var(--light)}
+.three-choice{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px}
+.six-choice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.six-choice .tc-btn{font-size:13px;padding:14px 4px}
+
+.save-btn{width:100%;background:var(--gold);color:var(--white);border:none;border-radius:10px;padding:20px;font-size:16px;font-weight:700;letter-spacing:.1em;margin:18px 0;box-shadow:var(--shadow);transition:opacity .15s}
+.save-btn:hover{opacity:.88}
+.del-btn{width:100%;background:none;color:var(--red);border:1.5px solid #e0a0a0;border-radius:10px;padding:14px;font-size:13px;font-weight:700;margin-bottom:18px;transition:all .15s}
+.del-btn:hover{background:#fdecea}
+
+/* HP DISPLAY */
+.hp-display{display:flex;gap:12px;margin:16px 0}
+.hp-box{flex:1;background:var(--white);border:2px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.hp-box-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hp-score{font-family:var(--mono);font-size:42px;font-weight:500;line-height:1}
+.hp-score.high{color:var(--hp-high)}
+.hp-score.mid{color:var(--hp-mid)}
+.hp-score.low{color:var(--hp-low)}
+.hp-unit{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* RECIPE */
+.drug-btn{background:var(--white);border:2px solid var(--border);border-radius:10px;padding:16px 10px;cursor:pointer;transition:all .18s;text-align:center;position:relative}
+.drug-btn.selected{border-color:var(--card-color,var(--gold));background:rgba(200,169,110,.08)}
+.drug-btn-name{font-size:16px;font-weight:700;margin-bottom:3px;line-height:1.3}
+.drug-btn-conc{font-family:var(--mono);font-size:12px;color:var(--card-color,var(--muted))}
+.drug-pip{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--card-color,var(--gold));opacity:0;transition:opacity .15s}
+.drug-btn.selected .drug-pip{opacity:1}
+
+.recipe-panel{background:var(--white);border:2px solid var(--border);border-radius:12px;overflow:hidden;margin:14px 0}
+.recipe-hero{background:var(--text);padding:20px 22px}
+.recipe-hero-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:5px}
+.recipe-hero-val{font-family:var(--mono);font-size:42px;font-weight:500;color:var(--white);line-height:1}
+.recipe-hero-unit{font-size:14px;color:rgba(255,255,255,.5);margin-left:5px}
+.recipe-amounts{padding:14px 16px;background:#faf9f6;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-bottom:1px solid var(--border)}
+.recipe-amt{background:var(--white);border-radius:8px;padding:13px 15px;border-left:4px solid var(--gold)}
+.recipe-amt-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.recipe-amt-val{font-family:var(--mono);font-size:26px;font-weight:500}
+.recipe-amt-unit{font-size:12px;color:var(--muted);margin-left:3px}
+.recipe-conc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.rci{background:var(--white);padding:12px 14px}
+.rci-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.rci-val{font-family:var(--mono);font-size:17px;font-weight:500}
+
+/* RECORD CARD */
+.record-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;transition:all .18s}
+.record-card:hover{border-color:var(--gold);box-shadow:var(--shadow)}
+.record-card-header{padding:14px 18px;display:flex;align-items:center;gap:10px}
+.record-date{font-family:var(--mono);font-size:14px;font-weight:500;flex:1}
+.hp-badge{font-size:12px;font-weight:700;border-radius:14px;padding:4px 11px;border:1.5px solid}
+.record-preview{padding:0 18px 14px;font-size:12px;color:var(--muted);line-height:1.9}
+
+/* PHOTO */
+.photo-upload{border:2px dashed var(--border);border-radius:10px;padding:26px;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.photo-upload:hover{border-color:var(--gold)}
+.photo-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-upload-icon{font-size:30px;margin-bottom:8px;opacity:.5}
+.photo-upload-text{font-size:12px;color:var(--muted);line-height:1.8}
+.photo-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.photo-thumb{aspect-ratio:1;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+/* LINE */
+.line-link-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#06c755;color:#fff;border:none;border-radius:10px;padding:16px;font-size:14px;font-weight:700;width:100%;text-decoration:none;margin:12px 0;transition:opacity .15s}
+.line-link-btn:hover{opacity:.88}
+
+/* SHARE CODE */
+.share-panel{background:var(--section);border:1.5px solid var(--border);border-radius:10px;padding:16px;margin:14px 0;text-align:center}
+.share-code{font-family:var(--mono);font-size:13px;background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:12px;margin:10px 0;word-break:break-all;text-align:left;line-height:1.7;color:var(--text)}
+
+/* TIMER */
+#timer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:8000}
+#timer-overlay.show{display:flex}
+.timer-box{background:var(--white);border-radius:18px;padding:42px 38px;text-align:center;box-shadow:var(--shadow);min-width:290px}
+.timer-display{font-family:var(--mono);font-size:60px;font-weight:500;color:var(--text);margin-bottom:8px;letter-spacing:.04em}
+.timer-alert{font-size:13px;color:var(--red);height:20px;margin-bottom:18px}
+.timer-actions{display:flex;gap:10px;justify-content:center}
+.timer-start{background:var(--green);color:var(--white);border:none;border-radius:8px;padding:14px 30px;font-size:14px;font-weight:700}
+.timer-stop{background:var(--orange);color:var(--white);border:none;border-radius:8px;padding:14px 30px;font-size:14px;font-weight:700;display:none}
+.timer-reset{background:var(--light);color:var(--muted);border:none;border-radius:8px;padding:14px 22px;font-size:14px;font-weight:700}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--white);padding:12px 24px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:9000;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* DELETE OVERLAY */
+#delete-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:8000}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- 削除オーバーレイ -->
+<div id="delete-overlay">
+  <div style="background:#fff;border-radius:16px;padding:30px 26px;max-width:300px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div id="delete-popup-name" style="font-size:18px;font-weight:700;margin-bottom:10px"></div>
+    <div style="font-size:12px;color:#999;margin-bottom:22px;line-height:1.8">この顧客の全施術記録も削除されます。<br>この操作は元に戻せません。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeDeleteOverlay()" style="background:#f0f0f0;color:#333;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer">キャンセル</button>
+      <button onclick="confirmDeleteClient()" style="background:#e74c3c;color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- タイマー -->
+<div id="timer-overlay">
+  <div class="timer-box">
+    <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">放置タイマー</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.8">📱 画面をスリープさせないでください<br>スタート時に確認音が鳴ります</p>
+    <div class="timer-display" id="timer-display">00:00</div>
+    <div class="timer-alert" id="timer-alert"></div>
+    <div class="timer-actions">
+      <button class="timer-start" id="timer-start-btn" onclick="timerStart()">▶ スタート</button>
+      <button class="timer-stop"  id="timer-stop-btn"  onclick="timerStop()">■ ストップ</button>
+      <button class="timer-reset" onclick="timerReset()">リセット</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:14px;font-family:var(--mono)" id="timer-recorded"></div>
+  </div>
+</div>
+
+<!-- ============================================================ PAGE 1: 顧客一覧 -->
+<div id="page-list" class="page active">
+  <div class="list-header">
+    <div class="list-logo">ReBALANCE</div>
+    <div class="list-rule"></div>
+    <div class="list-sub">Digital Carte</div>
+    <div class="list-ver">3.0</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="search" class="search-inp" id="search-inp" placeholder="顧客名で検索…" oninput="renderList()">
+    </div>
+  </div>
+  <div class="client-list" id="client-list"></div>
+  <button class="fab" onclick="openNewClient()">＋</button>
+</div>
+
+<!-- ============================================================ PAGE 2: 顧客詳細 -->
+<div id="page-detail" class="page">
+  <div class="app-header">
+    <button class="back-btn" onclick="goPage('list')">←</button>
+    <div><div class="header-title" id="detail-name">顧客詳細</div><div style="font-size:11px;color:var(--muted)" id="detail-sub"></div></div>
+    <button class="header-act" onclick="openNewRecord()">＋ 施術記録</button>
+  </div>
+  <div style="background:var(--white);padding:22px 20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px">
+    <div style="width:70px;height:70px;border-radius:50%;background:var(--light);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:28px;color:var(--muted);overflow:hidden;flex-shrink:0;cursor:pointer;position:relative" id="detail-avatar" onclick="changeProfilePhoto()">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;border-radius:50%;font-size:20px" class="cam-ov">📷</div>
+    </div>
+    <input type="file" id="profile-photo-inp" accept="image/*" style="display:none" onchange="onProfilePhoto(event)">
+    <div>
+      <div style="font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:.06em;margin-bottom:4px" id="detail-fullname"></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.9" id="detail-info"></div>
+    </div>
+  </div>
+  <div class="client-list" id="record-list"></div>
+</div>
+
+<!-- ============================================================ PAGE 3: 新規顧客 -->
+<div id="page-new-client" class="page">
+  <div class="app-header">
+    <button class="back-btn" onclick="goPage('list')">←</button>
+    <div class="header-title">新規顧客登録</div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-header"><div class="form-section-num">1</div><div class="form-section-title">基本情報</div></div>
+      <div class="form-section-body">
+        <div class="form-field"><label class="form-label">お名前 *</label><input type="text" class="form-input" id="nc-name" placeholder="山田 花子"></div>
+        <div class="form-field"><label class="form-label">ふりがな</label><input type="text" class="form-input" id="nc-kana" placeholder="やまだ はなこ"></div>
+        <div class="form-field"><label class="form-label">電話番号</label><input type="tel" class="form-input" id="nc-tel" placeholder="090-0000-0000"></div>
+        <div class="form-field"><label class="form-label">メモ（アレルギー・注意事項など）</label><textarea class="form-input" id="nc-memo" placeholder="自由入力"></textarea></div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveNewClient()">顧客を登録する</button>
+  </div>
+</div>
+
+<!-- ============================================================ PAGE 4: 施術記録 -->
+<div id="page-record" class="page">
+  <div class="app-header">
+    <button class="back-btn" onclick="goPage('detail')">←</button>
+    <div class="header-title" id="record-form-title">施術記録</div>
+  </div>
+  <div class="form-body">
+
+    <!-- ❶ ビフォー写真 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:var(--gold)">❶</div>
+        <div class="form-section-title">ビフォー写真（任意）</div>
+      </div>
+      <div class="form-section-body">
+        <div class="photo-upload">
+          <input type="file" id="before-photos" accept="image/*" multiple onchange="onBeforePhotos(event)">
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-text">タップして写真を選択（複数可）</div>
+        </div>
+        <div class="photo-preview" id="before-preview"></div>
+        <div class="form-field" style="margin-top:16px">
+          <label class="form-label">施術日</label>
+          <input type="date" class="form-input" id="rec-date">
+        </div>
+        <div class="form-field">
+          <label class="form-label">担当者</label>
+          <input type="text" class="form-input" id="rec-stylist" placeholder="担当者名">
+        </div>
+      </div>
+    </div>
+
+    <!-- ❷ 髪質診断 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#2c3e50">❷</div>
+        <div class="form-section-title">髪質診断 — 最大HPスコア</div>
+      </div>
+      <div class="form-section-body">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.9">先天的な毛髪体力（最大HP）を数値化します。各項目を選択してください。</p>
+
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">1. 毛径</label>
+          <div class="three-choice" style="grid-template-columns:repeat(4,1fr)">
+            <button class="tc-btn" data-group="hair1" data-val="9" onclick="selectHair(this)">太毛</button>
+            <button class="tc-btn" data-group="hair1" data-val="8" onclick="selectHair(this)">普通</button>
+            <button class="tc-btn" data-group="hair1" data-val="7" onclick="selectHair(this)">細毛</button>
+            <button class="tc-btn" data-group="hair1" data-val="6" onclick="selectHair(this)">極細</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">2. くせ</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="hair2" data-val="2" onclick="selectHair(this)">強め</button>
+            <button class="tc-btn" data-group="hair2" data-val="1" onclick="selectHair(this)">中くらい</button>
+            <button class="tc-btn" data-group="hair2" data-val="0" onclick="selectHair(this)">弱め</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">3. 硬度</label>
+          <div class="three-choice" style="grid-template-columns:repeat(4,1fr)">
+            <button class="tc-btn" data-group="hair3" data-val="2" onclick="selectHair(this)">硬め</button>
+            <button class="tc-btn" data-group="hair3" data-val="1" onclick="selectHair(this)">普通</button>
+            <button class="tc-btn" data-group="hair3" data-val="0" onclick="selectHair(this)">柔らかめ</button>
+            <button class="tc-btn" data-group="hair3" data-val="-1" onclick="selectHair(this)">極柔</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">4. 毛量</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="hair4" data-val="0" onclick="selectHair(this)">多め</button>
+            <button class="tc-btn" data-group="hair4" data-val="0" onclick="selectHair(this)">普通</button>
+            <button class="tc-btn" data-group="hair4" data-val="0" onclick="selectHair(this)">少なめ</button>
+          </div>
+        </div>
+
+        <div style="background:var(--section);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:8px;text-align:center">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">最大 毛髪体力 (HPスコア)</div>
+          <div style="font-family:var(--mono);font-size:40px;font-weight:500" id="max-hp-display">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ❸ 視診 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#8e44ad">❸</div>
+        <div class="form-section-title">視診 — ヘアカラー明度</div>
+      </div>
+      <div class="form-section-body">
+        <div class="form-field">
+          <label class="form-label" style="font-size:15px;color:var(--text);font-weight:700">根本</label>
+          <div class="six-choice">
+            <button class="tc-btn" data-group="vis-root" data-val="0"  onclick="selectHair(this)">ヘアカラー無</button>
+            <button class="tc-btn" data-group="vis-root" data-val="-1" onclick="selectHair(this)">〜7LV</button>
+            <button class="tc-btn" data-group="vis-root" data-val="-2" onclick="selectHair(this)">〜10LV</button>
+            <button class="tc-btn" data-group="vis-root" data-val="-3" onclick="selectHair(this)">〜13LV</button>
+            <button class="tc-btn" data-group="vis-root" data-val="-4" onclick="selectHair(this)">〜16LV</button>
+            <button class="tc-btn" data-group="vis-root" data-val="-5" onclick="selectHair(this)">17LV〜</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:15px;color:var(--text);font-weight:700">中間〜毛先</label>
+          <div class="six-choice">
+            <button class="tc-btn" data-group="vis-end" data-val="0"  onclick="selectHair(this)">ヘアカラー無</button>
+            <button class="tc-btn" data-group="vis-end" data-val="-1" onclick="selectHair(this)">〜7LV</button>
+            <button class="tc-btn" data-group="vis-end" data-val="-2" onclick="selectHair(this)">〜10LV</button>
+            <button class="tc-btn" data-group="vis-end" data-val="-3" onclick="selectHair(this)">〜13LV</button>
+            <button class="tc-btn" data-group="vis-end" data-val="-4" onclick="selectHair(this)">〜16LV</button>
+            <button class="tc-btn" data-group="vis-end" data-val="-5" onclick="selectHair(this)">17LV〜</button>
+          </div>
+        </div>
+
+        <!-- 黒染め・トーンダウン -->
+        <div style="background:#f8f5ff;border:1.5px solid #c8a0e0;border-radius:10px;padding:16px;margin-top:14px">
+          <p style="font-size:14px;font-weight:700;color:#7a40b0;margin-bottom:6px">🎨 黒染め・トーンダウンをしている場合</p>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.8">暗くする前の<strong>最高明度</strong>を聴き取り選択（問診必須）</p>
+          <div class="form-field" style="margin-bottom:14px">
+            <label class="form-label">最高明度（根本）</label>
+            <div class="six-choice">
+              <button class="tc-btn" data-group="td-root" data-val="0"  onclick="selectHair(this)">ヘアカラー無</button>
+              <button class="tc-btn" data-group="td-root" data-val="-1" onclick="selectHair(this)">〜7LV</button>
+              <button class="tc-btn" data-group="td-root" data-val="-2" onclick="selectHair(this)">〜10LV</button>
+              <button class="tc-btn" data-group="td-root" data-val="-3" onclick="selectHair(this)">〜13LV</button>
+              <button class="tc-btn" data-group="td-root" data-val="-4" onclick="selectHair(this)">〜16LV</button>
+              <button class="tc-btn" data-group="td-root" data-val="-5" onclick="selectHair(this)">17LV〜</button>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:0">
+            <label class="form-label">最高明度（毛先）</label>
+            <div class="six-choice">
+              <button class="tc-btn" data-group="td-end" data-val="0"  onclick="selectHair(this)">ヘアカラー無</button>
+              <button class="tc-btn" data-group="td-end" data-val="-1" onclick="selectHair(this)">〜7LV</button>
+              <button class="tc-btn" data-group="td-end" data-val="-2" onclick="selectHair(this)">〜10LV</button>
+              <button class="tc-btn" data-group="td-end" data-val="-3" onclick="selectHair(this)">〜13LV</button>
+              <button class="tc-btn" data-group="td-end" data-val="-4" onclick="selectHair(this)">〜16LV</button>
+              <button class="tc-btn" data-group="td-end" data-val="-5" onclick="selectHair(this)">17LV〜</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ❹ 問診 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#16a085">❹</div>
+        <div class="form-section-title">問診 — 施術履歴</div>
+      </div>
+      <div class="form-section-body">
+
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">▸ 問診1. ヘアカラー履歴</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">根本（頻度）</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="q1-root" data-val="-5" onclick="selectHair(this)">3週間以内</button>
+            <button class="tc-btn" data-group="q1-root" data-val="0"  onclick="selectHair(this)">それ以外</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">毛先（頻度）</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="q1-end" data-val="-5" onclick="selectHair(this)">3週間以内</button>
+            <button class="tc-btn" data-group="q1-end" data-val="0"  onclick="selectHair(this)">それ以外</button>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.8;background:var(--light);border-radius:8px;padding:10px 14px">※ヘナ・マニキュア・カラーシャンプー・トリートメントの場合は±0</p>
+
+        <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px">▸ 市販セルフカラー（酸化染毛料）</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">明度レベル</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="self-level" data-val="dark"  onclick="selectSelfColor(this,'dark')">5LV（黒系）</button>
+            <button class="tc-btn" data-group="self-level" data-val="light" onclick="selectSelfColor(this,'light')">7LV〜（明るめ）</button>
+          </div>
+        </div>
+        <div id="self-color-freq" style="display:none;margin-bottom:14px">
+          <div class="form-field">
+            <label class="form-label" style="font-size:14px;color:var(--text)">頻度（根本・毛先共通）</label>
+            <div class="three-choice">
+              <button class="tc-btn" data-group="self-freq" data-val-dark="-3" data-val-light="-5" onclick="selectSelfFreq(this)">1ヶ月毎</button>
+              <button class="tc-btn" data-group="self-freq" data-val-dark="-2" data-val-light="-4" onclick="selectSelfFreq(this)">2ヶ月毎</button>
+              <button class="tc-btn" data-group="self-freq" data-val-dark="-1" data-val-light="-3" onclick="selectSelfFreq(this)">3ヶ月以上</button>
+            </div>
+          </div>
+          <p style="font-size:11px;color:#c0392b;line-height:1.8;background:#fff8f8;border-radius:8px;padding:10px 14px;border:1px solid #f0c0c0">⚠️ 市販カラーはリタッチが広範囲になりやすく繰り返すと吸水毛になる場合があります</p>
+        </div>
+
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">▸ 問診2. ブリーチ履歴 ⚠️</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">根本</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="q2-root" data-val="0"  onclick="selectHair(this)">履歴なし</button>
+            <button class="tc-btn" data-group="q2-root" data-val="-2" onclick="selectHair(this)">1週間以内</button>
+            <button class="tc-btn" data-group="q2-root" data-val="0"  onclick="selectHair(this)">1週間以前</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">毛先（累計回数）</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="q2-end" data-val="0"  onclick="selectHair(this)">履歴なし</button>
+            <button class="tc-btn" data-group="q2-end" data-val="-1" onclick="selectHair(this)">〜2回</button>
+            <button class="tc-btn" data-group="q2-end" data-val="-2" onclick="selectHair(this)">3回以上</button>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#c0392b;margin-bottom:16px;line-height:1.8;background:#fff8f8;border-radius:8px;padding:10px 14px;border:1px solid #f0c0c0">⚠️ ブリーチ直後は残留アルカリが還元をブーストするため危険です</p>
+
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">▸ 問診3. 縮毛矯正履歴</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">根本</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="q3-root" data-val="0"  onclick="selectHair(this)">履歴なし</button>
+            <button class="tc-btn" data-group="q3-root" data-val="-3" onclick="selectHair(this)">4ヶ月以内</button>
+            <button class="tc-btn" data-group="q3-root" data-val="0"  onclick="selectHair(this)">4ヶ月以上</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">毛先（累計回数）</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="q3-end" data-val="0"  onclick="selectHair(this)">履歴なし</button>
+            <button class="tc-btn" data-group="q3-end" data-val="-2" onclick="selectHair(this)">〜2回</button>
+            <button class="tc-btn" data-group="q3-end" data-val="-4" onclick="selectHair(this)">3回以上</button>
+          </div>
+        </div>
+
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">▸ 問診4. 全体染めカラー歴</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">根本（ダブルカラー）</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="q4-root" data-val="-1" onclick="selectHair(this)">1ヶ月以内</button>
+            <button class="tc-btn" data-group="q4-root" data-val="0"  onclick="selectHair(this)">それ以外</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">毛先（累計回数）</label>
+          <div class="three-choice">
+            <button class="tc-btn" data-group="q4-end" data-val="0"  onclick="selectHair(this)">履歴なし</button>
+            <button class="tc-btn" data-group="q4-end" data-val="-1" onclick="selectHair(this)">〜2回</button>
+            <button class="tc-btn" data-group="q4-end" data-val="-3" onclick="selectHair(this)">3回以上</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ❺ 触診 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#2980b9">❺</div>
+        <div class="form-section-title">触診（ウェット後）</div>
+      </div>
+      <div class="form-section-body">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.9">ウェット後の弾性チェック（必要なら毛髪体力の見直しをする）</p>
+        <div class="form-field">
+          <label class="form-label" style="font-size:15px;color:var(--text)">根本部</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="touch-root" data-val="strong" onclick="selectHair(this)">ハリコシあり</button>
+            <button class="tc-btn" data-group="touch-root" data-val="weak"   onclick="selectHair(this)">ハリコシなし</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:15px;color:var(--text)">毛先</label>
+          <div class="three-choice" style="grid-template-columns:1fr 1fr">
+            <button class="tc-btn" data-group="touch-end" data-val="strong" onclick="selectHair(this)">ハリコシあり</button>
+            <button class="tc-btn" data-group="touch-end" data-val="weak"   onclick="selectHair(this)">ハリコシなし</button>
+          </div>
+        </div>
+
+        <!-- アイロン -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+          <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px">アイロン（コテ）使用状況</p>
+          <div class="form-field">
+            <label class="form-label" style="font-size:14px;color:var(--text)">使用頻度</label>
+            <div class="three-choice">
+              <button class="tc-btn" data-group="iron-freq" data-val="daily"  onclick="selectHair(this)">ほぼ毎日</button>
+              <button class="tc-btn" data-group="iron-freq" data-val="weekly" onclick="selectHair(this)">週1回程度</button>
+              <button class="tc-btn" data-group="iron-freq" data-val="none"   onclick="selectHair(this)">使用しない</button>
+            </div>
+          </div>
+          <div class="form-field" id="iron-temp-field">
+            <label class="form-label" style="font-size:14px;color:var(--text)">アイロン温度</label>
+            <div class="three-choice" style="grid-template-columns:repeat(4,1fr)">
+              <button class="tc-btn" data-group="iron-temp" data-val="low"   onclick="calcIronScore(this)">140℃未満</button>
+              <button class="tc-btn" data-group="iron-temp" data-val="mid"   onclick="calcIronScore(this)">140〜160℃</button>
+              <button class="tc-btn" data-group="iron-temp" data-val="high"  onclick="calcIronScore(this)">160〜180℃</button>
+              <button class="tc-btn" data-group="iron-temp" data-val="vhigh" onclick="calcIronScore(this)">180℃以上</button>
+            </div>
+          </div>
+          <div id="iron-score-display" style="display:none;background:var(--section);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text);line-height:1.8"></div>
+        </div>
+
+        <a href="https://line.me/ti/p/NePE8YhC0z" target="_blank" class="line-link-btn" style="margin-top:16px">
+          💬 LINEにて運営者に質問する
+        </a>
+        <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.8">タイミングが合わない事もございますのでご了承ください。</p>
+      </div>
+    </div>
+
+    <!-- HP表示（触診後） -->
+    <div class="hp-display">
+      <div class="hp-box">
+        <div class="hp-box-label">根本　毛髪体力</div>
+        <div style="display:flex;align-items:baseline;justify-content:center;gap:3px">
+          <span class="hp-score" id="hp-root-display">—</span>
+          <span style="font-size:20px;color:var(--muted);margin:0 3px">/</span>
+          <span id="max-hp-root-frac" style="font-family:var(--mono);font-size:22px;color:var(--muted)">—</span>
+        </div>
+        <div class="hp-unit">診断後 / 最大HP</div>
+      </div>
+      <div class="hp-box">
+        <div class="hp-box-label">毛先　毛髪体力</div>
+        <div style="display:flex;align-items:baseline;justify-content:center;gap:3px">
+          <span class="hp-score" id="hp-end-display">—</span>
+          <span style="font-size:20px;color:var(--muted);margin:0 3px">/</span>
+          <span id="max-hp-end-frac" style="font-family:var(--mono);font-size:22px;color:var(--muted)">—</span>
+        </div>
+        <div class="hp-unit">診断後 / 最大HP</div>
+      </div>
+    </div>
+
+    <!-- HP=0 ポップアップ -->
+    <div id="hp-zero-warning" style="display:none;background:#fff8f0;border:2px solid var(--orange);border-radius:12px;padding:18px;margin:4px 0 16px">
+      <p style="font-size:14px;font-weight:700;color:var(--orange);margin-bottom:10px">⚠️ 毛髪体力(HPスコア)が0の場合の対応</p>
+      <p style="font-size:13px;line-height:2.0;color:var(--text)">
+        <strong style="color:var(--red)">クセ戻りがある場合</strong><br>
+        → HP 1〜2 を手動入力してください<br><br>
+        <strong style="color:var(--blue)">クセ戻りがない場合</strong><br>
+        → HP 0.1 を推奨（Pale Yellow + RIKO Treatment）
+      </p>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);line-height:2.0">
+        <strong style="color:var(--text)">ウェット触診結果を参考に：</strong><br>
+        ハリコシあり → HP 0.5〜3 に変更<br>
+        ハリコシなし → HP 0のまま、または 0.2〜1 に変更<br>
+        <span style="color:var(--green)">※RIKO Treatmentの割合を増やす / Pale Yellow推奨</span>
+      </div>
+    </div>
+
+    <!-- ❻ レシピ計算 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:var(--gold)">❻</div>
+        <div class="form-section-title">適正還元値 &amp; 薬剤分量計算</div>
+      </div>
+      <div class="form-section-body">
+
+        <!-- 根本/毛先タブ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px">
+          <button id="rtab-root" onclick="switchTab('root')" style="padding:14px;font-size:15px;font-weight:700;border:none;background:var(--red);color:#fff;letter-spacing:.04em;transition:all .15s">根本</button>
+          <button id="rtab-end"  onclick="switchTab('end')"  style="padding:14px;font-size:15px;font-weight:700;border:none;background:var(--light);color:var(--muted);letter-spacing:.04em;transition:all .15s">毛先</button>
+        </div>
+
+        <!-- 根本パネル -->
+        <div id="rpanel-root">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap">根本 HP</div>
+            <input type="number" id="hp-root-adj" step="0.1" placeholder="—" oninput="calcRecipe('root')"
+              style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:26px;font-weight:500;outline:none;color:var(--text);transition:border-color .15s">
+          </div>
+
+          <!-- ベース剤選択 -->
+          <p style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">▸ STEP1 ベース剤を選択（最大3種）</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+            <div class="drug-btn" style="--card-color:#c8a800" id="db-root-yellow" onclick="toggleDrug('root','yellow',this)">
+              <div class="drug-pip" style="background:#c8a800"></div>
+              <div class="drug-btn-name" style="color:#c8a800">Yellow</div>
+              <div class="drug-btn-conc">TGr 0.4%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0.8% total</div>
+            </div>
+            <div class="drug-btn" style="--card-color:#3a8a4a" id="db-root-pale" onclick="toggleDrug('root','pale',this)">
+              <div class="drug-pip" style="background:#3a8a4a"></div>
+              <div class="drug-btn-name" style="color:#3a8a4a">Pale Yellow</div>
+              <div class="drug-btn-conc">TGr 0.2%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0.2% total</div>
+            </div>
+            <div class="drug-btn" style="--card-color:#c8a96e" id="db-root-riko" onclick="toggleDrug('root','riko',this)">
+              <div class="drug-pip" style="background:#c8a96e"></div>
+              <div class="drug-btn-name" style="color:#c8a96e">RIKO Tr.</div>
+              <div class="drug-btn-conc">還元剤0%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0% total</div>
+            </div>
+          </div>
+
+          <!-- 比率入力 -->
+          <div id="ratio-root-wrap" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div id="ratio-root-inputs"></div>
+          </div>
+
+          <!-- Booster -->
+          <p style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">▸ STEP2 Boosterの添加（任意）</p>
+          <div class="drug-btn" style="--card-color:#1a1a2a;margin-bottom:16px" id="db-root-boost" onclick="toggleDrug('root','boost',this)">
+            <div class="drug-pip" style="background:#1a1a2a"></div>
+            <div class="drug-btn-name" style="color:var(--text);font-size:18px">Booster</div>
+            <div class="drug-btn-conc" style="color:var(--muted)">CAM 29% — 質感向上 + 還元ブースト</div>
+          </div>
+          <div id="boost-root-wrap" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <label class="form-label">Booster（HPに応じて自動計算）</label>
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <input type="number" id="boost-root-amt" step="0.1" min="0" placeholder="自動計算" readonly style="background:var(--light);color:var(--muted)"
+                style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:28px;font-weight:500;outline:none;color:var(--text)">
+              <span style="font-family:var(--mono);font-size:16px;color:var(--muted)">g</span>
+            </div>
+          </div>
+
+          <!-- 薬剤総量 -->
+          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px">STEP3 仕上がり総量を入力</div>
+          <div style="display:flex;align-items:baseline;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:14px">
+            <input type="number" id="rec-total-root" placeholder="120" min="1" oninput="calcRecipe('root')"
+              style="flex:1;background:none;border:none;font-family:var(--mono);font-size:30px;font-weight:500;outline:none;color:var(--text)">
+            <span style="font-family:var(--mono);font-size:16px;color:var(--muted)">g</span>
+          </div>
+
+          <!-- 根本結果 -->
+          <div id="recipe-result-root" style="display:none">
+            <div class="recipe-panel">
+              <div class="recipe-hero">
+                <div class="recipe-hero-label">適正還元値（根本）</div>
+                <div><span class="recipe-hero-val" id="res-root-conc">—</span><span class="recipe-hero-unit">%</span></div>
+              </div>
+              <div class="recipe-amounts" id="res-root-amounts"></div>
+              <div class="recipe-conc-grid">
+                <div class="rci"><div class="rci-label" style="color:var(--red)">TGA</div><div class="rci-val" style="color:var(--red)"><span id="res-root-tga">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+                <div class="rci"><div class="rci-label" style="color:var(--blue)">CAM</div><div class="rci-val" style="color:var(--blue)"><span id="res-root-cam">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+                <div class="rci"><div class="rci-label" style="color:var(--green)">TGr</div><div class="rci-val" style="color:var(--green)"><span id="res-root-tg">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /rpanel-root -->
+
+        <!-- 毛先パネル -->
+        <div id="rpanel-end" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap">毛先 HP</div>
+            <input type="number" id="hp-end-adj" step="0.1" placeholder="—" oninput="calcRecipe('end')"
+              style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:26px;font-weight:500;outline:none;color:var(--text);transition:border-color .15s">
+          </div>
+
+          <p style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">▸ STEP1 ベース剤を選択（最大3種）</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+            <div class="drug-btn" style="--card-color:#c8a800" id="db-end-yellow" onclick="toggleDrug('end','yellow',this)">
+              <div class="drug-pip" style="background:#c8a800"></div>
+              <div class="drug-btn-name" style="color:#c8a800">Yellow</div>
+              <div class="drug-btn-conc">TGr 0.4%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0.8% total</div>
+            </div>
+            <div class="drug-btn" style="--card-color:#3a8a4a" id="db-end-pale" onclick="toggleDrug('end','pale',this)">
+              <div class="drug-pip" style="background:#3a8a4a"></div>
+              <div class="drug-btn-name" style="color:#3a8a4a">Pale Yellow</div>
+              <div class="drug-btn-conc">TGr 0.2%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0.2% total</div>
+            </div>
+            <div class="drug-btn" style="--card-color:#c8a96e" id="db-end-riko" onclick="toggleDrug('end','riko',this)">
+              <div class="drug-pip" style="background:#c8a96e"></div>
+              <div class="drug-btn-name" style="color:#c8a96e">RIKO Tr.</div>
+              <div class="drug-btn-conc">還元剤0%</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">0% total</div>
+            </div>
+          </div>
+          <div id="ratio-end-wrap" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div id="ratio-end-inputs"></div>
+          </div>
+
+          <p style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:10px">▸ STEP2 Boosterの添加（任意）</p>
+          <div class="drug-btn" style="--card-color:#1a1a2a;margin-bottom:16px" id="db-end-boost" onclick="toggleDrug('end','boost',this)">
+            <div class="drug-pip" style="background:#1a1a2a"></div>
+            <div class="drug-btn-name" style="color:var(--text);font-size:18px">Booster</div>
+            <div class="drug-btn-conc" style="color:var(--muted)">CAM 29% — 質感向上 + 還元ブースト</div>
+          </div>
+          <div id="boost-end-wrap" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <label class="form-label">Booster（HPに応じて自動計算）</label>
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <input type="number" id="boost-end-amt" step="0.1" min="0" placeholder="自動計算" readonly style="background:var(--light);color:var(--muted)"
+                style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:28px;font-weight:500;outline:none;color:var(--text)">
+              <span style="font-family:var(--mono);font-size:16px;color:var(--muted)">g</span>
+            </div>
+          </div>
+
+          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px">STEP3 仕上がり総量を入力</div>
+          <div style="display:flex;align-items:baseline;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:14px">
+            <input type="number" id="rec-total-end" placeholder="120" min="1" oninput="calcRecipe('end')"
+              style="flex:1;background:none;border:none;font-family:var(--mono);font-size:30px;font-weight:500;outline:none;color:var(--text)">
+            <span style="font-family:var(--mono);font-size:16px;color:var(--muted)">g</span>
+          </div>
+
+          <div id="recipe-result-end" style="display:none">
+            <div class="recipe-panel">
+              <div class="recipe-hero" style="background:#2980b9">
+                <div class="recipe-hero-label">適正還元値（毛先）</div>
+                <div><span class="recipe-hero-val" id="res-end-conc">—</span><span class="recipe-hero-unit">%</span></div>
+              </div>
+              <div class="recipe-amounts" id="res-end-amounts"></div>
+              <div class="recipe-conc-grid">
+                <div class="rci"><div class="rci-label" style="color:var(--red)">TGA</div><div class="rci-val" style="color:var(--red)"><span id="res-end-tga">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+                <div class="rci"><div class="rci-label" style="color:var(--blue)">CAM</div><div class="rci-val" style="color:var(--blue)"><span id="res-end-cam">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+                <div class="rci"><div class="rci-label" style="color:var(--green)">TGr</div><div class="rci-val" style="color:var(--green)"><span id="res-end-tg">—</span><span style="font-size:11px;color:var(--muted);margin-left:2px">%</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /rpanel-end -->
+
+        <!-- タイマー -->
+        <button onclick="openTimer()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:16px;font-size:14px;font-weight:700;letter-spacing:.08em;margin-top:12px">
+          ⏱ 薬剤を塗る前にタイマーをスタート
+        </button>
+      </div>
+    </div>
+
+    <!-- ❼ アフター写真・備忘録 -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:var(--gold)">❼</div>
+        <div class="form-section-title">アフター写真・備忘録</div>
+      </div>
+      <div class="form-section-body">
+        <div class="photo-upload">
+          <input type="file" id="after-photos" accept="image/*" multiple onchange="onAfterPhotos(event)">
+          <div class="photo-upload-icon">✨</div>
+          <div class="photo-upload-text">アフター写真（任意・複数可）</div>
+        </div>
+        <div class="photo-preview" id="after-preview"></div>
+        <div class="form-field" style="margin-top:16px">
+          <label class="form-label">備忘録・メモ</label>
+          <textarea class="form-input" id="rec-note" placeholder="施術中の気づき、お客様の感想、次回の方針など" style="min-height:100px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ❽ 仕上げ・ホームケア（フリー入力のみ） -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#8e44ad">❽</div>
+        <div class="form-section-title">仕上げ・ホームケア</div>
+      </div>
+      <div class="form-section-body">
+        <div class="form-field">
+          <label class="form-label">仕上げトリートメント</label>
+          <textarea class="form-input" id="treat-free" placeholder="使用したトリートメント内容を記入" style="min-height:70px"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">アウトバス・ホームケア</label>
+          <textarea class="form-input" id="home-free" placeholder="ご提案・ご購入いただいたホームケア" style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 来店コース -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <div class="form-section-num" style="background:#1a6a9a">📅</div>
+        <div class="form-section-title">来店コース・次回推奨日</div>
+      </div>
+      <div class="form-section-body">
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">来店コースを選択</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
+            <button class="tc-btn" data-group="visit-course" data-weeks="8"  onclick="selectCourse(this,'8週間（年6回）')">年6回<br><span style="font-size:11px;color:var(--muted)">約2ヶ月ごと</span></button>
+            <button class="tc-btn" data-group="visit-course" data-weeks="13" onclick="selectCourse(this,'13週間（年4回）')">年4回<br><span style="font-size:11px;color:var(--muted)">約3ヶ月ごと</span></button>
+            <button class="tc-btn" data-group="visit-course" data-weeks="17" onclick="selectCourse(this,'17週間（年3回）')">年3回<br><span style="font-size:11px;color:var(--muted)">約4ヶ月ごと</span></button>
+            <button class="tc-btn" data-group="visit-course" data-weeks="26" onclick="selectCourse(this,'26週間（年2回）')">年2回<br><span style="font-size:11px;color:var(--muted)">約6ヶ月ごと</span></button>
+            <button class="tc-btn" data-group="visit-course" data-weeks="6"  onclick="selectCourse(this,'6週間（前髪のみ）')" style="grid-column:span 2">前髪のみ<br><span style="font-size:11px;color:var(--muted)">約1.5ヶ月ごと</span></button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="font-size:14px;color:var(--text)">目標日（任意）</label>
+          <input type="text" class="form-input" id="rec-goal-date" placeholder="例）2026年10月 結婚式">
+        </div>
+
+        <!-- 推奨日・確定日 表示エリア -->
+        <div style="background:var(--light);border-radius:10px;padding:16px;margin-top:4px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap;min-width:90px">次回推奨日</span>
+              <input type="date" class="form-input" id="rec-next-visit"
+                style="flex:1;font-size:15px;font-weight:700;color:var(--blue);background:var(--white)">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;color:var(--blue);font-weight:700;white-space:nowrap;min-width:90px">予約確定日</span>
+              <input type="date" class="form-input" id="rec-confirmed-visit"
+                oninput="onConfirmedVisitChange()"
+                style="flex:1;font-size:15px;font-weight:700;color:var(--blue);background:var(--white)">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 共有コード生成 -->
+    <div style="background:var(--section);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin:14px 0">
+      <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">📤 お客様へ共有</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.9">施術内容を共有コードとしてLINEで送信できます。お客様はコードを使って自分の記録を確認できます。</p>
+      <button onclick="generateShareCode()" style="width:100%;background:var(--text);color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;margin-bottom:10px">🔗 共有コードを生成</button>
+      <div id="share-code-box" style="display:none">
+        <div class="share-code" id="share-code-text"></div>
+        <button onclick="copyShareCode()" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;margin-bottom:8px">📋 コードをコピー</button>
+        <a id="share-line-btn" href="#" target="_blank" class="line-link-btn" style="margin:0">💬 LINEで共有コードを送信</a>
+        <p style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.8">お客様はこのコードを保存することで、いつでも施術情報を確認できます。</p>
+      </div>
+    </div>
+
+    <!-- 推奨手順 -->
+    <div style="background:#f0f8f4;border:1px solid var(--green);border-radius:10px;padding:14px 18px;margin:14px 0 8px">
+      <p style="font-size:15px;color:#1a5c40;font-weight:700;margin-bottom:10px">📋 推奨手順</p>
+      <p style="font-size:13px;color:#555;line-height:2.1">① 共有コードを生成 → LINEでお客様に送信<br>② 写真を削除（容量節約）<br>③ 保存する</p>
+    </div>
+
+    <button class="save-btn" onclick="saveRecord()">この施術記録を保存</button>
+    <button class="del-btn" id="del-record-btn" onclick="deleteRecord()" style="display:none">この記録を削除する</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// 薬剤マスタ
+// ================================================================
+const DRUGS3 = {
+  yellow: { name:'Yellow',       tga:0.4, cam:0,    tg:0.4, color:'#c8a800' },
+  pale:   { name:'Pale Yellow',  tga:0,   cam:0,    tg:0.2, color:'#3a8a4a' },
+  riko:   { name:'RIKO Tr.',     tga:0,   cam:0,    tg:0,   color:'#c8a96e' },
+  boost:  { name:'Booster',      tga:0,   cam:29.0, tg:0,   color:'#1a1a2a' },
+};
+
+// ================================================================
+// State
+// ================================================================
+const STORE3 = 'rb_dc3_v1';
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE3))||{clients:[]}; }catch(e){ return {clients:[]}; } }
+function save(d){ localStorage.setItem(STORE3, JSON.stringify(d)); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+let currentClientId=null, currentRecordId=null, editingRecord=false;
+let beforePhotos=[], afterPhotos=[];
+let hairSel={};
+let selfColorLevel=null;
+let selectedDrugs={ root:[], end:[] }; // ['yellow','pale','riko','boost']
+let ratioVals={ root:{yellow:1,pale:0,riko:0}, end:{yellow:1,pale:0,riko:0} };
+let boostAmt={ root:0, end:0 };
+let visitCourseWeeks=null, visitCourseLabel='';
+let timerInterval=null, timerSecs=0, timerRunning=false, timerRecorded=null;
+let currentTab='root';
+let audioCtx=null;
+
+// ================================================================
+// Pages
+// ================================================================
+function goPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ================================================================
+// 顧客一覧
+// ================================================================
+function renderList(){
+  const data=load();
+  const q=(document.getElementById('search-inp').value||'').toLowerCase();
+  const clients=data.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(c.kana||'').includes(q));
+  const el=document.getElementById('client-list');
+  if(!clients.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">✂️</div><div class="empty-text">顧客が登録されていません<br>右下の ＋ から登録してください</div></div>';
+    return;
+  }
+  el.innerHTML=clients.map(c=>{
+    const cnt=(c.records||[]).length;
+    const last=cnt>0?c.records[c.records.length-1].date:'—';
+    const av=c.photoB64?`<img src="${c.photoB64}">`:(c.name.slice(0,1));
+    return `<div class="client-card" onclick="openClient('${c.id}')" oncontextmenu="return false" ontouchstart="startLongPress('${c.id}',event)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
+      <div class="client-avatar">${av}</div>
+      <div class="client-info"><div class="client-name">${c.name}</div><div class="client-meta">${c.kana||''} ／ 最終：${last}</div></div>
+      <div class="client-count">${cnt}件</div>
+    </div>`;
+  }).join('');
+}
+
+function openNewClient(){
+  ['nc-name','nc-kana','nc-tel','nc-memo'].forEach(id=>document.getElementById(id).value='');
+  goPage('new-client');
+}
+function saveNewClient(){
+  const name=document.getElementById('nc-name').value.trim();
+  if(!name){ toast('お名前を入力してください'); return; }
+  const data=load();
+  data.clients.unshift({id:uid(),name,kana:document.getElementById('nc-kana').value.trim(),tel:document.getElementById('nc-tel').value.trim(),memo:document.getElementById('nc-memo').value.trim(),records:[],createdAt:new Date().toISOString()});
+  save(data); toast('顧客を登録しました'); renderList(); goPage('list');
+}
+
+// ================================================================
+// 顧客詳細
+// ================================================================
+function openClient(cid){
+  currentClientId=cid;
+  const data=load(); const c=data.clients.find(x=>x.id===cid); if(!c) return;
+  document.getElementById('detail-name').textContent=c.name;
+  document.getElementById('detail-sub').textContent=c.kana||'';
+  document.getElementById('detail-fullname').textContent=c.name;
+  document.getElementById('detail-info').innerHTML=[c.tel&&`📞 ${c.tel}`,c.memo&&`📝 ${c.memo}`].filter(Boolean).join('<br>')||'—';
+  const av=document.getElementById('detail-avatar');
+  av.querySelectorAll('img,span').forEach(e=>e.remove());
+  if(c.photoB64){ const img=document.createElement('img'); img.src=c.photoB64; img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%'; av.insertBefore(img,av.firstChild); }
+  else { const sp=document.createElement('span'); sp.style.cssText='font-family:var(--serif);font-size:28px;color:var(--muted)'; sp.textContent=c.name.slice(0,1); av.insertBefore(sp,av.firstChild); }
+  renderRecords(c); goPage('detail');
+}
+function changeProfilePhoto(){ document.getElementById('profile-photo-inp').click(); }
+function onProfilePhoto(e){
+  const f=e.target.files[0]; if(!f) return;
+  compressImage(f).then(b64=>{ const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return; c.photoB64=b64; save(data); openClient(currentClientId); toast('写真を更新しました'); });
+}
+function renderRecords(c){
+  const el=document.getElementById('record-list');
+  const recs=(c.records||[]).slice().reverse();
+  if(!recs.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">施術記録がありません<br>右上の ＋施術記録 から追加</div></div>'; return; }
+  el.innerHTML=`<div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:14px 0 10px;display:flex;align-items:center;gap:10px">施術記録（${recs.length}件）<span style="flex:1;height:1px;background:var(--border);display:block"></span></div>`+
+    recs.map(r=>{
+      const hpR=r.hpRoot!==undefined?r.hpRoot:'—';
+      const hpE=r.hpEnd!==undefined?r.hpEnd:'—';
+      return `<div class="record-card" onclick="openRecord('${r.id}')">
+        <div class="record-card-header">
+          <span class="record-date">📅 ${r.date||'—'}</span>
+          <span class="hp-badge" style="color:var(--blue);border-color:var(--blue)">HP 根${hpR}/毛${hpE}</span>
+        </div>
+        <div class="record-preview">${r.stylist?'担当：'+r.stylist+'　':''}${r.note?r.note.slice(0,40)+'…':''}</div>
+      </div>`;
+    }).join('');
+}
+
+// ================================================================
+// 施術記録フォーム
+// ================================================================
+function openNewRecord(){
+  editingRecord=false; currentRecordId=null;
+  hairSel={}; selfColorLevel=null;
+  selectedDrugs={root:[],end:[]}; ratioVals={root:{yellow:1,pale:0,riko:0},end:{yellow:1,pale:0,riko:0}};
+  boostAmt={root:0,end:0};
+  beforePhotos=[]; afterPhotos=[];
+  ['before-preview','after-preview'].forEach(id=>document.getElementById(id).innerHTML='');
+  ['rec-date','rec-stylist','rec-note','treat-free','home-free','rec-goal-date'].forEach(id=>document.getElementById(id).value='');
+  ['rec-total-root','rec-total-end','hp-root-adj','hp-end-adj'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('rec-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('record-form-title').textContent='新規施術記録';
+  document.getElementById('del-record-btn').style.display='none';
+  document.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
+  ['ratio-root-wrap','ratio-end-wrap','boost-root-wrap','boost-end-wrap','self-color-freq','share-code-box'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
+  ['recipe-result-root','recipe-result-end'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
+  document.getElementById('max-hp-display').textContent='—';
+  document.getElementById('hp-root-display').textContent='—';
+  document.getElementById('hp-end-display').textContent='—';
+  document.getElementById('hp-zero-warning').style.display='none';
+  visitCourseWeeks=null; visitCourseLabel='';
+  ['rec-next-visit','rec-confirmed-visit'].forEach(id=>document.getElementById(id).value='');
+
+  timerRecorded=null;
+  switchTab('root');
+  goPage('record');
+}
+
+function openRecord(rid){
+  const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return;
+  const r=(c.records||[]).find(x=>x.id===rid); if(!r) return;
+  currentRecordId=rid; editingRecord=true;
+  hairSel=r.hairSel||{}; selfColorLevel=r.selfColorLevel||null;
+  selectedDrugs=r.selectedDrugs||{root:[],end:[]};
+  ratioVals=r.ratioVals||{root:{yellow:1,pale:0,riko:0},end:{yellow:1,pale:0,riko:0}};
+  boostAmt=r.boostAmt||{root:0,end:0};
+  beforePhotos=r.beforePhotos||[]; afterPhotos=r.afterPhotos||[];
+  ['rec-date','rec-stylist','rec-note','treat-free','home-free','rec-goal-date'].forEach(id=>{
+    const key=id.replace('rec-','').replace('treat-free','treatFree').replace('home-free','homeFree').replace('goal-date','goalDate');
+    document.getElementById(id).value=r[key]||'';
+  });
+  document.getElementById('rec-date').value=r.date||'';
+  document.getElementById('rec-stylist').value=r.stylist||'';
+  document.getElementById('rec-note').value=r.note||'';
+  document.getElementById('treat-free').value=r.treatFree||'';
+  document.getElementById('home-free').value=r.homeFree||'';
+  document.getElementById('rec-goal-date').value=r.goalDate||'';
+  if(document.getElementById('rec-total-root')) document.getElementById('rec-total-root').value=r.totalRoot||'';
+  if(document.getElementById('rec-total-end'))  document.getElementById('rec-total-end').value=r.totalEnd||'';
+  document.getElementById('hp-root-adj').value=r.hpRoot||'';
+  document.getElementById('hp-end-adj').value=r.hpEnd||'';
+  document.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('selected'));
+  Object.entries(hairSel).forEach(([g,v])=>{
+    document.querySelectorAll(`.tc-btn[data-group="${g}"]`).forEach(b=>{ if(b.dataset.val===String(v)) b.classList.add('selected'); });
+  });
+  // 薬剤ボタン復元
+  ['root','end'].forEach(part=>{
+    (selectedDrugs[part]||[]).forEach(d=>{
+      const btn=document.getElementById(`db-${part}-${d}`);
+      if(btn) btn.classList.add('selected');
+    });
+    updateRatioInputs(part);
+    if(selectedDrugs[part].includes('boost')){ const bw=document.getElementById(`boost-${part}-wrap`); if(bw) bw.style.display='block'; const ba=document.getElementById(`boost-${part}-amt`); if(ba) ba.value=boostAmt[part]||0; }
+  });
+  renderPhotoPreview('before-preview',beforePhotos);
+  renderPhotoPreview('after-preview',afterPhotos);
+  calcHPScores();
+  document.getElementById('record-form-title').textContent='施術記録を編集';
+  document.getElementById('del-record-btn').style.display='block';
+  timerRecorded=r.timerRecorded||null;
+  goPage('record');
+  setTimeout(()=>{ calcRecipe('root'); calcRecipe('end'); },100);
+}
+
+// ================================================================
+// HP計算
+// ================================================================
+function selectHair(btn){
+  const g=btn.dataset.group;
+  document.querySelectorAll(`.tc-btn[data-group="${g}"]`).forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  hairSel[g]=btn.dataset.val;
+  if(g==='iron-freq'){
+    const tb=document.querySelector('.tc-btn[data-group="iron-temp"].selected');
+    if(tb) calcIronScore(tb);
+    else if(btn.dataset.val==='none'){ hairSel['iron-root']=0; hairSel['iron-end']=0; document.getElementById('iron-score-display').style.display='none'; }
+  }
+  calcHPScores();
+}
+
+function calcHPScores(){
+  const h1=parseInt(hairSel['hair1']||0);
+  const h2=parseInt(hairSel['hair2']||0);
+  const h3=parseInt(hairSel['hair3']||0);
+  const maxHP=(hairSel['hair1']!==undefined)?h1+h2+h3:null;
+  const mx=document.getElementById('max-hp-display');
+  if(maxHP!==null){ mx.textContent=maxHP; mx.style.color=hpColor(maxHP); }
+  else { mx.textContent='—'; mx.style.color=''; }
+  if(maxHP===null) return;
+
+  let hpR=maxHP+parseInt(hairSel['vis-root']||0);
+  let hpE=maxHP+parseInt(hairSel['vis-end']||0);
+  [['q1-root','q1-end'],['q2-root','q2-end'],['q3-root','q3-end'],['q4-root','q4-end']].forEach(([gr,ge])=>{
+    hpR+=parseInt(hairSel[gr]||0); hpE+=parseInt(hairSel[ge]||0);
+  });
+  hpR+=parseInt(hairSel['self-freq']||0); hpE+=parseInt(hairSel['self-freq']||0);
+  hpR+=parseInt(hairSel['iron-root']||0); hpE+=parseInt(hairSel['iron-end']||0);
+  hpR+=parseInt(hairSel['td-root']||0);   hpE+=parseInt(hairSel['td-end']||0);
+  hpR=Math.max(0,hpR); hpE=Math.max(0,hpE);
+
+  const rEl=document.getElementById('hp-root-display'); const eEl=document.getElementById('hp-end-display');
+  rEl.textContent=hpR; rEl.className='hp-score '+hpClass(hpR);
+  eEl.textContent=hpE; eEl.className='hp-score '+hpClass(hpE);
+  document.getElementById('hp-zero-warning').style.display=(hpR===0||hpE===0)?'block':'none';
+  const fracR=document.getElementById('max-hp-root-frac'); const fracE=document.getElementById('max-hp-end-frac');
+  if(fracR) fracR.textContent=maxHP; if(fracE) fracE.textContent=maxHP;
+  document.getElementById('hp-root-adj').value=hpR;
+  document.getElementById('hp-end-adj').value=hpE;
+  calcRecipe('root'); calcRecipe('end');
+}
+
+function hpColor(v){ return v>=12?'var(--hp-high)':v>=8?'var(--hp-mid)':'var(--hp-low)'; }
+function hpClass(v){ return v>=12?'high':v>=8?'mid':'low'; }
+
+// ================================================================
+// セルフカラー
+// ================================================================
+function selectSelfColor(btn,level){
+  document.querySelectorAll('[data-group="self-level"]').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected'); selfColorLevel=level;
+  document.getElementById('self-color-freq').style.display='block';
+  document.querySelectorAll('[data-group="self-freq"]').forEach(b=>b.classList.remove('selected'));
+  hairSel['self-freq']=0; calcHPScores();
+}
+function selectSelfFreq(btn){
+  document.querySelectorAll('[data-group="self-freq"]').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  hairSel['self-freq']=parseInt(selfColorLevel==='dark'?btn.dataset.valDark:btn.dataset.valLight||0);
+  calcHPScores();
+}
+
+// ================================================================
+// アイロン
+// ================================================================
+function calcIronScore(btn){
+  document.querySelectorAll('[data-group="iron-temp"]').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const freq=hairSel['iron-freq']||''; const temp=btn.dataset.val;
+  const disp=document.getElementById('iron-score-display');
+  if(freq==='none'){ disp.style.display='none'; return; }
+  const hard=(temp==='high'||temp==='vhigh')&&(freq==='daily'||freq==='weekly');
+  hairSel['iron-root']=hard?-1:0; hairSel['iron-end']=hard?-2:-1;
+  disp.style.display='block';
+  disp.innerHTML=hard?`硬さを感じる → 根本 <strong>${hairSel['iron-root']}</strong> / 毛先 <strong>${hairSel['iron-end']}</strong>`:`硬さを感じない → 根本 <strong>${hairSel['iron-root']}</strong> / 毛先 <strong>${hairSel['iron-end']}</strong>`;
+  calcHPScores();
+}
+
+// ================================================================
+// タブ
+// ================================================================
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('rpanel-root').style.display=tab==='root'?'block':'none';
+  document.getElementById('rpanel-end').style.display=tab==='end'?'block':'none';
+  const s='padding:14px;font-size:15px;font-weight:700;border:none;letter-spacing:.04em;transition:all .15s;';
+  document.getElementById('rtab-root').style.cssText=s+(tab==='root'?'background:var(--red);color:#fff;':'background:var(--light);color:var(--muted);');
+  document.getElementById('rtab-end').style.cssText=s+(tab==='end'?'background:#2980b9;color:#fff;':'background:var(--light);color:var(--muted);');
+}
+
+// ================================================================
+// 薬剤選択（ベース剤・Booster）
+// ================================================================
+function toggleDrug(part, drug, el){
+  const BASE=['yellow','pale','riko'];
+  const sel=selectedDrugs[part];
+  const idx=sel.indexOf(drug);
+  if(drug==='boost'){
+    if(idx>=0){ sel.splice(idx,1); el.classList.remove('selected'); document.getElementById(`boost-${part}-wrap`).style.display='none'; }
+    else { sel.push(drug); el.classList.add('selected'); document.getElementById(`boost-${part}-wrap`).style.display='block'; }
+    calcRecipe(part); return;
+  }
+  // ベース剤：最大3種
+  if(idx>=0){ sel.splice(idx,1); el.classList.remove('selected'); }
+  else {
+    const baseCount=sel.filter(d=>BASE.includes(d)).length;
+    if(baseCount>=3){ toast('ベース剤は最大3種です'); return; }
+    sel.push(drug); el.classList.add('selected');
+    // 新規追加時は比率を1に初期化
+    if(!ratioVals[part][drug]||ratioVals[part][drug]===0) ratioVals[part][drug]=1;
+  }
+  updateRatioInputs(part);
+  calcRecipe(part);
+}
+
+function updateRatioInputs(part){
+  const BASE=['yellow','pale','riko'];
+  const NAMES={yellow:'Yellow',pale:'Pale Yellow',riko:'RIKO Tr.'};
+  const COLORS={yellow:'#c8a800',pale:'#3a8a4a',riko:'#c8a96e'};
+  const sel=selectedDrugs[part].filter(function(d){ return BASE.includes(d); });
+  const wrap=document.getElementById('ratio-'+part+'-wrap');
+  const inp=document.getElementById('ratio-'+part+'-inputs');
+  if(sel.length<1){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+
+  // DOM要素を直接作成（文字列連結を避ける）
+  const container=document.createElement('div');
+  const title=document.createElement('div');
+  title.style.cssText='font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:10px';
+  title.textContent='混合比率';
+  container.appendChild(title);
+
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+
+  sel.forEach(function(d,i){
+    const col=document.createElement('div');
+    col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px';
+
+    const lbl=document.createElement('span');
+    lbl.style.cssText='font-size:12px;font-weight:700;color:'+COLORS[d];
+    lbl.textContent=NAMES[d];
+    col.appendChild(lbl);
+
+    const input=document.createElement('input');
+    input.type='number';
+    input.id='ratio-'+part+'-'+d;
+    input.value=ratioVals[part][d]||1;
+    input.min=0; input.step=0.5;
+    input.style.cssText='width:68px;background:var(--white);border:1.5px solid var(--border);border-radius:6px;padding:10px;font-family:var(--mono);font-size:22px;font-weight:500;text-align:center;outline:none;color:var(--text)';
+    // クロージャで part と d をキャプチャ
+    (function(p,drug){ input.addEventListener('input',function(){ onRatioInput(p,drug,this.value); }); })(part,d);
+    col.appendChild(input);
+    row.appendChild(col);
+
+    if(i<sel.length-1){
+      const sep=document.createElement('span');
+      sep.style.cssText='font-family:var(--mono);font-size:20px;color:var(--muted)';
+      sep.textContent='：';
+      row.appendChild(sep);
+    }
+  });
+
+  container.appendChild(row);
+  inp.innerHTML='';
+  inp.appendChild(container);
+}
+
+function onRatioInput(part, drug, val){
+  ratioVals[part][drug]=parseFloat(val)||0;
+  calcRecipe(part);
+}
+
+// ================================================================
+// レシピ計算（2.0ケア重視から移植）
+// HP = 目標還元値
+// ベース剤比率 → Boosterで逆算して調整
+// ================================================================
+function calcRecipe(part){
+  const T   = parseFloat(document.getElementById('rec-total-'+part).value);
+  const tgt = parseFloat(document.getElementById('hp-'+part+'-adj').value);
+  const resEl = document.getElementById('recipe-result-'+part);
+  if(!T||T<=0||isNaN(tgt)||tgt<0){ resEl.style.display='none'; return; }
+
+  const BASE = ['yellow','pale','riko'];
+  const baseSel = selectedDrugs[part].filter(d=>BASE.includes(d));
+  if(baseSel.length===0){ resEl.style.display='none'; return; }
+
+  const sumRatio = baseSel.reduce((a,d)=>a+(ratioVals[part][d]||0),0);
+  if(sumRatio<=0){ resEl.style.display='none'; return; }
+
+  const Y=DRUGS3.yellow, P=DRUGS3.pale, RK=DRUGS3.riko, B=DRUGS3.boost;
+
+  // 比率取得
+  const rY  = (baseSel.includes('yellow') ? (ratioVals[part]['yellow']||0) : 0);
+  const rP  = (baseSel.includes('pale')   ? (ratioVals[part]['pale']  ||0) : 0);
+  const rRK = (baseSel.includes('riko')   ? (ratioVals[part]['riko']  ||0) : 0);
+  const sumR = rY+rP+rRK || 1;
+
+  // ベース剤のみの還元値（%）
+  const baseTot = (Y.tga*rY + P.tga*rP)/100/sumR*100
+                + (Y.cam*rY + P.cam*rP)/100/sumR*100
+                + (Y.tg *rY + P.tg *rP)/100/sumR*100;
+
+  const bTot = B.tga+B.cam+B.tg; // Booster還元値 29%
+  const hasBoost = selectedDrugs[part].includes('boost');
+
+  let boostAmt_g=0, baseAmt_g=T;
+
+  if(hasBoost){
+    if(tgt<=baseTot){
+      // Boosterなしで目標以上 → Booster 0g
+      boostAmt_g=0; baseAmt_g=T;
+    } else if(tgt>=bTot){
+      resEl.style.display='none'; return;
+    } else {
+      boostAmt_g = T*(tgt-baseTot)/(bTot-baseTot);
+      baseAmt_g  = T-boostAmt_g;
+    }
+  }
+
+  const rYa  = baseAmt_g*rY /sumR;
+  const rPa  = baseAmt_g*rP /sumR;
+  const rRKa = baseAmt_g*rRK/sumR;
+
+  const pure_tga = (rYa*Y.tga + rPa*P.tga)/100;
+  const pure_cam = (boostAmt_g*B.cam)/100;
+  const pure_tg  = (rYa*Y.tg  + rPa*P.tg)/100;
+
+  const totalConc = (pure_tga+pure_cam+pure_tg)/T*100;
+
+  // 表示
+  document.getElementById('res-'+part+'-conc').textContent = totalConc.toFixed(3);
+  document.getElementById('res-'+part+'-tga').textContent  = (pure_tga/T*100).toFixed(3);
+  document.getElementById('res-'+part+'-cam').textContent  = (pure_cam/T*100).toFixed(3);
+  document.getElementById('res-'+part+'-tg').textContent   = (pure_tg /T*100).toFixed(3);
+
+  const COLORS={yellow:'#c8a800',pale:'#3a8a4a',riko:'#c8a96e',boost:'#1a1a2a'};
+  const NAMES ={yellow:'Yellow', pale:'Pale Yellow',riko:'RIKO Tr.',boost:'Booster'};
+
+  const amtEntries=[
+    ...(hasBoost&&boostAmt_g>0?[{d:'boost',amt:boostAmt_g}]:[]),
+    ...(rYa >0?[{d:'yellow',amt:rYa }]:[]),
+    ...(rPa >0?[{d:'pale',  amt:rPa }]:[]),
+    ...(rRKa>0?[{d:'riko',  amt:rRKa}]:[]),
+  ];
+
+  document.getElementById('res-'+part+'-amounts').innerHTML=amtEntries.map(({d,amt})=>`
+    <div class="recipe-amt" style="border-left-color:${COLORS[d]}">
+      <div class="recipe-amt-label" style="color:${COLORS[d]}">${NAMES[d]}</div>
+      <div><span class="recipe-amt-val">${amt.toFixed(1)}</span><span class="recipe-amt-unit">g</span></div>
+    </div>`).join('');
+
+  resEl.style.display='block';
+}
+
+// ================================================================
+// 保存
+// ================================================================
+function saveRecord(){
+  const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return;
+  const record={
+    id:editingRecord?currentRecordId:uid(),
+    date:document.getElementById('rec-date').value,
+    stylist:document.getElementById('rec-stylist').value.trim(),
+    note:document.getElementById('rec-note').value.trim(),
+    treatFree:document.getElementById('treat-free').value.trim(),
+    homeFree:document.getElementById('home-free').value.trim(),
+    goalDate:document.getElementById('rec-goal-date').value,
+    totalRoot:(document.getElementById('rec-total-root')||{value:''}).value,
+    totalEnd:(document.getElementById('rec-total-end')||{value:''}).value,
+    hairSel, selfColorLevel, selectedDrugs, ratioVals, boostAmt,
+    hpRoot:parseFloat(document.getElementById('hp-root-adj').value)||null,
+    hpEnd:parseFloat(document.getElementById('hp-end-adj').value)||null,
+    timerRecorded, beforePhotos:beforePhotos.slice(0,3), afterPhotos:afterPhotos.slice(0,3),
+    nextVisit:document.getElementById('rec-next-visit').value,
+    confirmedVisit:document.getElementById('rec-confirmed-visit').value,
+    visitCourseLabel,
+    updatedAt:new Date().toISOString()
+  };
+  if(!c.records) c.records=[];
+  if(editingRecord){ const i=c.records.findIndex(r=>r.id===currentRecordId); if(i>=0) c.records[i]=record; else c.records.push(record); }
+  else c.records.push(record);
+  save(data); toast('施術記録を保存しました'); renderRecords(c); goPage('detail');
+}
+function deleteRecord(){
+  if(!confirm('この施術記録を削除しますか？')) return;
+  const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return;
+  c.records=(c.records||[]).filter(r=>r.id!==currentRecordId);
+  save(data); toast('削除しました'); renderRecords(c); goPage('detail');
+}
+
+// ================================================================
+// 共有コード生成
+// ================================================================
+function generateShareCode(){
+  const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return;
+  const hpR=document.getElementById('hp-root-adj').value||'—';
+  const hpE=document.getElementById('hp-end-adj').value||'—';
+  const nextVisit=document.getElementById('rec-next-visit').value||'—';
+  const date=document.getElementById('rec-date').value||'—';
+  const conR=(document.getElementById('res-root-conc')||{textContent:'—'}).textContent;
+  const conE=(document.getElementById('res-end-conc')||{textContent:'—'}).textContent;
+  const treatFree=document.getElementById('treat-free').value||'—';
+  const homeFree=document.getElementById('home-free').value||'—';
+  const note=document.getElementById('rec-note').value||'';
+
+  // コード生成（シンプルなテキスト形式）
+  // 薬剤レシピ取得
+  const getAmts = (part) => {
+    const el = document.getElementById('res-'+part+'-amounts');
+    if(!el) return '未計算';
+    const labels = el.querySelectorAll('.recipe-amt-label');
+    const vals   = el.querySelectorAll('.recipe-amt-val');
+    if(!labels.length) return '未計算';
+    return Array.from(labels).map((l,i)=>l.textContent+'：'+(vals[i]?vals[i].textContent+'g':'')).join(' / ');
+  };
+  const totalRoot = (document.getElementById('rec-total-root')||{value:''}).value;
+  const totalEnd  = (document.getElementById('rec-total-end') ||{value:''}).value;
+  const amtRoot = getAmts('root');
+  const amtEnd  = getAmts('end');
+
+  const code=[
+    '【ReBALANCE 施術記録】',
+    'お名前：'+c.name,
+    '施術日：'+date,
+    '─────────────',
+    '毛髪体力HP　根本：'+hpR+' ／ 毛先：'+hpE,
+    '─────────────',
+    '▸ 根本レシピ（使用量：'+(totalRoot||'—')+'g）',
+    '  薬剤：'+amtRoot,
+    '  適正還元値：'+conR+'%',
+    '▸ 毛先レシピ（使用量：'+(totalEnd||'—')+'g）',
+    '  薬剤：'+amtEnd,
+    '  適正還元値：'+conE+'%',
+    '─────────────',
+    '仕上げ：'+treatFree,
+    'ホームケア：'+homeFree,
+    ...(note?['メモ：'+note]:[]),
+    '─────────────',
+    '次回推奨日：'+nextVisit,
+    '※ReBALANCE Digital Carte 3.0',
+  ].join('\n');
+
+  document.getElementById('share-code-text').textContent=code;
+  document.getElementById('share-code-box').style.display='block';
+
+  // LINE送信URL
+  const encoded=encodeURIComponent(code);
+  document.getElementById('share-line-btn').href=`https://line.me/R/share?text=${encoded}`;
+  toast('共有コードを生成しました');
+}
+
+function copyShareCode(){
+  const text=document.getElementById('share-code-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('コードをコピーしました')).catch(()=>toast('長押しでコピーしてください'));
+}
+
+// ================================================================
+// 来店コース
+// ================================================================
+function selectCourse(btn,label){
+  document.querySelectorAll('[data-group="visit-course"]').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected'); visitCourseWeeks=parseInt(btn.dataset.weeks); visitCourseLabel=label;
+  const dateVal=document.getElementById('rec-date').value;
+  if(dateVal){ const d=new Date(dateVal); d.setDate(d.getDate()+visitCourseWeeks*7); document.getElementById('rec-next-visit').value=d.toISOString().slice(0,10); }
+}
+
+
+// ================================================================
+// 長押し削除
+// ================================================================
+let longPressTimer=null, longPressClientId=null;
+function startLongPress(cid,e){ longPressClientId=cid; longPressTimer=setTimeout(()=>{ const data=load(); const c=data.clients.find(x=>x.id===cid); if(!c) return; document.getElementById('delete-popup-name').textContent=c.name; const ov=document.getElementById('delete-overlay'); ov.style.display='flex'; },600); }
+function cancelLongPress(){ if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; } }
+function closeDeleteOverlay(){ document.getElementById('delete-overlay').style.display='none'; longPressClientId=null; }
+function confirmDeleteClient(){ if(!longPressClientId) return; const data=load(); data.clients=data.clients.filter(x=>x.id!==longPressClientId); save(data); closeDeleteOverlay(); toast('顧客を削除しました'); renderList(); }
+
+// ================================================================
+// 写真
+// ================================================================
+function compressImage(f,mW=800,mH=800,q=0.7){ return new Promise(res=>{ const reader=new FileReader(); reader.onload=e=>{ const img=new window.Image(); img.onload=()=>{ let w=img.width,h=img.height; if(w>mW||h>mH){ const r=Math.min(mW/w,mH/h); w=Math.round(w*r); h=Math.round(h*r); } const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); res(cv.toDataURL('image/jpeg',q)); }; img.src=e.target.result; }; reader.readAsDataURL(f); }); }
+function onBeforePhotos(e){ Promise.all(Array.from(e.target.files).map(f=>compressImage(f))).then(r=>{ r.forEach(b=>beforePhotos.push(b)); renderPhotoPreview('before-preview',beforePhotos); toast('写真を追加しました'); }); }
+function onAfterPhotos(e){ Promise.all(Array.from(e.target.files).map(f=>compressImage(f))).then(r=>{ r.forEach(b=>afterPhotos.push(b)); renderPhotoPreview('after-preview',afterPhotos); toast('写真を追加しました'); }); }
+function renderPhotoPreview(id,arr){ document.getElementById(id).innerHTML=arr.map((b,i)=>`<div class="photo-thumb"><img src="${b}"><button class="photo-del" onclick="removePhoto('${id}',${i})">×</button></div>`).join(''); }
+function removePhoto(id,i){ const m={'before-preview':beforePhotos,'after-preview':afterPhotos}; const arr=m[id]; if(arr){ arr.splice(i,1); renderPhotoPreview(id,arr); } }
+function changeProfilePhoto(){ document.getElementById('profile-photo-inp').click(); }
+function onProfilePhoto(e){ const f=e.target.files[0]; if(!f) return; compressImage(f).then(b64=>{ const data=load(); const c=data.clients.find(x=>x.id===currentClientId); if(!c) return; c.photoB64=b64; save(data); openClient(currentClientId); toast('写真を更新しました'); }); }
+
+// ================================================================
+// タイマー
+// ================================================================
+function openTimer(){ document.getElementById('timer-overlay').classList.add('show'); }
+function initAudio(){ if(!audioCtx){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx=null; } } if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); }
+function playBeep(){ initAudio(); if(!audioCtx) return; try{ const play=()=>{ [0,.15,.3,.45].forEach(t=>{ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.setValueAtTime(.4,audioCtx.currentTime+t); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+t+.12); o.start(audioCtx.currentTime+t); o.stop(audioCtx.currentTime+t+.14); }); }; audioCtx.state==='suspended'?audioCtx.resume().then(play):play(); }catch(e){} }
+function timerStart(){ if(timerRunning) return; initAudio(); playBeep(); timerRunning=true; document.getElementById('timer-start-btn').style.display='none'; document.getElementById('timer-stop-btn').style.display='inline-block'; timerInterval=setInterval(()=>{ timerSecs++; const m=Math.floor(timerSecs/60).toString().padStart(2,'0'); const s=(timerSecs%60).toString().padStart(2,'0'); document.getElementById('timer-display').textContent=`${m}:${s}`; if(timerSecs%300===0){ document.getElementById('timer-alert').textContent=`⏰ ${Math.floor(timerSecs/60)}分経過！`; playBeep(); setTimeout(()=>document.getElementById('timer-alert').textContent='',3000); } },1000); }
+function timerStop(){ if(!timerRunning) return; clearInterval(timerInterval); timerRunning=false; const m=Math.floor(timerSecs/60).toString().padStart(2,'0'); const s=(timerSecs%60).toString().padStart(2,'0'); timerRecorded=`${m}:${s}`; document.getElementById('timer-recorded').textContent=`記録：${timerRecorded}`; document.getElementById('timer-stop-btn').style.display='none'; document.getElementById('timer-start-btn').style.display='inline-block'; }
+function timerReset(){ clearInterval(timerInterval); timerRunning=false; timerSecs=0; document.getElementById('timer-display').textContent='00:00'; document.getElementById('timer-alert').textContent=''; document.getElementById('timer-recorded').textContent=''; document.getElementById('timer-stop-btn').style.display='none'; document.getElementById('timer-start-btn').style.display='inline-block'; document.getElementById('timer-overlay').classList.remove('show'); }
+
+// ================================================================
+// Toast
+// ================================================================
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+
+// ================================================================
+// Init
+// ================================================================
+renderList();
+</script>
+</body>
+</html>
